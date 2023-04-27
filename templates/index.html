@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Uploader</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+        }
+        label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #3e8e41;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Uploader</h1>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <label for="image-input">Choose an image to upload:</label>
+            <input type="file" id="image-input" name="file">
+            <button type="submit">Upload</button>
+        </form>
+        <div id="result-container"></div>
+    </div>
+    <script>
+        const form = document.getElementById('upload-form');
+        const resultContainer = document.getElementById('result-container');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const imageSrc = `data:image/png;base64,${btoa(xhr.response)}`;
+                        resultContainer.innerHTML = `<img src="${imageSrc}" alt="Uploaded Image">`;
+                    } else {
+                        resultContainer.innerHTML = `<p>Upload failed. Please try again later.</p>`;
+                    }
+                }
+            };
+
+            xhr.open('POST', '/process_image', true);
+            xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+            xhr.responseType = 'arraybuffer';
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>
